@@ -10,7 +10,11 @@ services:
       - ./backend:/usr/src/app
       - /usr/src/app/node_modules
     environment:
-      NODE_ENV: development
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY}
+      DB_HOST: seu-banco-remoto.com
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
 
   frontend:
     build:

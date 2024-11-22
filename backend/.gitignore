@@ -1,0 +1,6 @@
+# Node.js
+node_modules/
+dist/
+
+# Configurações do ambiente local
+.env
