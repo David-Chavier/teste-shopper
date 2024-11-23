@@ -1,21 +1,14 @@
-version: '3.8'
-
 services:
   backend:
     build:
       context: ./backend
+    env_file:
+      - ./backend/.env
     ports:
       - "8080:8080"
     volumes:
       - ./backend:/usr/src/app
       - /usr/src/app/node_modules
-    environment:
-      GOOGLE_API_KEY: ${GOOGLE_API_KEY}
-      DB_HOST: seu-banco-remoto.com
-      DB_USER: ${DB_USER}
-      DB_PASSWORD: ${DB_PASSWORD}
-      DB_NAME: ${DB_NAME}
-
   frontend:
     build:
       context: ./frontend
