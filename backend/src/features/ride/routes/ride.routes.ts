@@ -1,12 +1,12 @@
 import { Router } from "express";
-import { estimate, getRides } from "../../travelController";
+import { confirmRide, estimate } from "../controllers/ride.controller";
 
 export const rideRoutes = () => {
   const router = Router();
 
   router.post('/estimate', estimate);
-  router.patch('/confirm', estimate);
-  router.get('/:customer_id', getRides)
+  router.patch('/confirm', confirmRide);
+  // router.get('/:customer_id', estimate)
 
   return router;
 };

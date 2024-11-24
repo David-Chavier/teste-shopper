@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { googleMapsClient, getGoogleMapsAPIKey } from "../../../config/googleMaps.config";
 import {driversMock} from "../../../shared/constants/drivers.constants";
 import { Driver } from "../../../models/driver.model";
+import { RideRepository } from "../../../database/ride.repository";
 
 export const estimate = async (req: Request, res: Response) => {
   try {
@@ -71,10 +72,70 @@ export const estimate = async (req: Request, res: Response) => {
       routeResponse: route,
     });
   } catch (error) {
-    console.error("Erro no endpoint /ride/estimate:", error);
     res.status(500).json({
       error_code: "SERVER_ERROR",
       error_description: "Ocorreu um erro ao calcular a estimativa. Tente novamente mais tarde.",
+    });
+  }
+};
+
+export const confirmRide = async (req: Request, res: Response) => {
+  try {
+    const { customer_id, origin, destination, distance, duration, driver, value } = req.body;
+
+    if (!customer_id || !origin || !destination || !distance || !driver || !value) {
+      return res.status(400).json({
+        error_code: "INVALID_DATA",
+        error_description: "Todos os campos obrigatórios devem ser informados.",
+      });
+    }
+
+    if (origin === destination) {
+      return res.status(400).json({
+        error_code: "INVALID_DATA",
+        error_description: "Os endereços de origem e destino não podem ser iguais.",
+      });
+    }
+
+    const selectedDriver: Driver | undefined = driversMock.find((d) => d.id === driver.id && d.name === driver.name);
+    if (!selectedDriver) {
+      return res.status(404).json({
+        error_code: "DRIVER_NOT_FOUND",
+        error_description: "O motorista informado não foi encontrado.",
+      });
+    }
+
+    if (distance < selectedDriver.minKm) {
+      return res.status(406).json({
+        error_code: "INVALID_DISTANCE",
+        error_description: `A quilometragem (${distance} km) é menor do que o mínimo aceito pelo motorista (${selectedDriver.minKm} km).`,
+      });
+    }
+
+    const savedRide = await RideRepository.saveRide({
+      customer_id,
+      origin,
+      destination,
+      distance,
+      duration,
+      driver_id: driver.id,
+      driver_name: driver.name,
+      value,
+    });
+
+    return res.status(200).json({success: true});
+
+  } catch (error: any) {
+    if (error.message === "DATABASE_ERROR") {
+      return res.status(500).json({
+        error_code: "SERVER_ERROR",
+        error_description: "Erro ao salvar os dados da viagem.",
+      });
+    }
+
+    return res.status(500).json({
+      error_code: "SERVER_ERROR",
+      error_description: "Ocorreu um erro interno no servidor.",
     });
   }
 };
