@@ -36,4 +36,39 @@ export class RideRepository {
       throw new Error("DATABASE_ERROR");
     }
   }
+
+  static async findRidesByCustomer(customer_id: string, driver_id?: number): Promise<any[]> {
+    let query = `
+      SELECT 
+        id, 
+        created_at AS date, 
+        origin, 
+        destination, 
+        distance, 
+        duration, 
+        driver_id AS "driver.id", 
+        driver_name AS "driver.name", 
+        value 
+      FROM rides 
+      WHERE customer_id = $1
+    `;
+
+    const params: any[] = [customer_id];
+
+    // Adiciona filtro pelo motorista, se informado
+    if (driver_id) {
+      query += ` AND driver_id = $2`;
+      params.push(driver_id);
+    }
+
+    // Ordena os resultados pela data, do mais recente para o mais antigo
+    query += ` ORDER BY created_at DESC`;
+
+    try {
+      const result = await pool.query(query, params);
+      return result.rows;
+    } catch (error) {
+      throw new Error("DATABASE_ERROR");
+    }
+  }
 }

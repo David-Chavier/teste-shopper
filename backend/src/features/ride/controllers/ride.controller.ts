@@ -112,7 +112,7 @@ export const confirmRide = async (req: Request, res: Response) => {
       });
     }
 
-    const savedRide = await RideRepository.saveRide({
+    await RideRepository.saveRide({
       customer_id,
       origin,
       destination,
@@ -136,6 +136,49 @@ export const confirmRide = async (req: Request, res: Response) => {
     return res.status(500).json({
       error_code: "SERVER_ERROR",
       error_description: "Ocorreu um erro interno no servidor.",
+    });
+  }
+};
+
+export const getRidesByCustomer = async (req: Request, res: Response) => {
+  try {
+    const { customer_id } = req.params;
+    const { driver_id } = req.query;
+
+    if (!customer_id) {
+      return res.status(400).json({
+        error_code: "INVALID_CUSTOMER",
+        error_description: "O id do usuário não pode estar em branco.",
+      });
+    }
+
+    if (driver_id && isNaN(Number(driver_id))) {
+      return res.status(400).json({
+        error_code: "INVALID_DRIVER",
+        error_description: "O id do motorista informado é inválido.",
+      });
+    }
+
+    const rides = await RideRepository.findRidesByCustomer(
+      customer_id,
+      driver_id ? Number(driver_id) : undefined
+    );
+
+    if (rides.length === 0) {
+      return res.status(404).json({
+        error_code: "NO_RIDES_FOUND",
+        error_description: "Nenhum registro encontrado.",
+      });
+    }
+
+    return res.status(200).json({
+      customer_id,
+      rides,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      error_code: "INTERNAL_ERROR",
+      error_description: "Erro ao processar a solicitação.",
     });
   }
 };
