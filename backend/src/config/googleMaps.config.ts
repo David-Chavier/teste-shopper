@@ -6,7 +6,7 @@ dotenv.config();
 const googleMapsBaseURL = "https://maps.googleapis.com/maps/api";
 
 export const getGoogleMapsAPIKey = () => {
-  const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+  const apiKey = process.env.GOOGLE_API_KEY;
   if (!apiKey) {
     throw new Error("API Key do Google Maps não configurada!");
   }

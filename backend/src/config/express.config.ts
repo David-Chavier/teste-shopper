@@ -6,5 +6,5 @@ export const configureExpress = (app: Express): void => {
 //   app.use(cors());
   app.use(express.json());
 
-  app.use('/ride', rideRoutes);
+  app.use('/ride', rideRoutes());
 };
