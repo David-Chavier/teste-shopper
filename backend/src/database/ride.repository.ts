@@ -1,16 +1,8 @@
 import pool from "../config/database.config";
+import { RideCreateType } from "../types/ride.Type";
 
 export class RideRepository {
-  static async saveRide(data: {
-    customer_id: string;
-    origin: string;
-    destination: string;
-    distance: number;
-    duration: string;
-    driver_id: number;
-    driver_name: string;
-    value: number;
-  }): Promise<any> {
+  static async saveRide(data: RideCreateType): Promise<any> {
     const query = `
       INSERT INTO rides (
         customer_id, origin, destination, distance, duration, driver_id, driver_name, value
@@ -24,8 +16,8 @@ export class RideRepository {
       data.destination,
       data.distance,
       data.duration,
-      data.driver_id,
-      data.driver_name,
+      data.driver.id,
+      data.driver.name,
       data.value,
     ];
 
@@ -46,8 +38,8 @@ export class RideRepository {
         destination, 
         distance, 
         duration, 
-        driver_id AS "driver.id", 
-        driver_name AS "driver.name", 
+        driver_id, 
+        driver_name, 
         value 
       FROM rides 
       WHERE customer_id = $1
@@ -55,13 +47,11 @@ export class RideRepository {
 
     const params: any[] = [customer_id];
 
-    // Adiciona filtro pelo motorista, se informado
     if (driver_id) {
       query += ` AND driver_id = $2`;
       params.push(driver_id);
     }
 
-    // Ordena os resultados pela data, do mais recente para o mais antigo
     query += ` ORDER BY created_at DESC`;
 
     try {

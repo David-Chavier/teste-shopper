@@ -1,6 +1,6 @@
-import { Driver } from "../../models/driver.model";
+import { DriverModel } from "../../models/driver.model";
 
-export const driversMock: Driver[] = [
+export const driversMock: DriverModel[] = [
     {
       id: 1,
       name: "Homer Simpson",

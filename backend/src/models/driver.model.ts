@@ -1,4 +1,4 @@
-export interface Driver {
+export interface DriverModel {
     id: number;
     name: string;
     description: string;
