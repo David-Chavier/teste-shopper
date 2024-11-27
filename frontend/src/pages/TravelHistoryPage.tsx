@@ -1,47 +1,38 @@
 import React, { useState } from 'react';
 import { Box, TextField, Select, MenuItem, Button, Typography, Grid, Paper } from '@mui/material';
-
-interface TravelHistory {
-  id: string;
-  date: string;
-  driverName: string;
-  origin: string;
-  destination: string;
-  distance: string;
-  time: string;
-  price: number;
-}
+import { ridesGet } from '../services/rideService';
 
 const TravelHistoryPage: React.FC = () => {
   const [userId, setUserId] = useState('');
   const [selectedDriver, setSelectedDriver] = useState('all');
-  const [travelHistory, setTravelHistory] = useState<TravelHistory[]>([
-    {
-      id: '1',
-      date: '2024-11-25 15:30',
-      driverName: 'João',
-      origin: 'Rua A, 123',
-      destination: 'Av. B, 456',
-      distance: '10 km',
-      time: '15 min',
-      price: 35.5,
-    },
-    {
-      id: '2',
-      date: '2024-11-24 10:00',
-      driverName: 'Maria',
-      origin: 'Praça C',
-      destination: 'Rua D',
-      distance: '8 km',
-      time: '12 min',
-      price: 30.0,
-    },
-  ]);
+  const [travelHistory, setTravelHistory] = useState<any | undefined>();
+  const [error, setError] = useState<string | null>(null);
 
-  const handleFilter = () => {
-    console.log(`Filtrando viagens para o usuário ${userId} e motorista ${selectedDriver}`);
-    // Simular um filtro com base nos critérios (aqui seria feita a chamada à API)
-  };
+  function handleFilter(){
+    setError(null);
+
+    ridesGet(userId).then((rideEstimateResult)=>{
+      setTravelHistory(rideEstimateResult)
+    }).catch((error)=>{
+      setError(error.response.data.error_description);
+    })
+  }
+  if(travelHistory?.ridesDTO){
+    console.log(travelHistory.ridesDTO)
+  }
+
+  function formatDateTimeSimple(isoString: string): string {
+    const date = new Date(isoString);
+  
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+  
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+  
+    return `${day}/${month}/${year} ${hours}:${minutes}`;
+  }
 
   return (
     <Box padding={4}>
@@ -73,20 +64,19 @@ const TravelHistoryPage: React.FC = () => {
         </Button>
       </Box>
 
-      {/* Lista de Viagens */}
       <Grid container spacing={2}>
-        {travelHistory.map((travel) => (
+        {travelHistory?.ridesDTO.map((travel: any) => (
           <Grid item xs={12} key={travel.id}>
             <Paper elevation={3} sx={{ padding: 2 }}>
               <Typography variant="subtitle1" fontWeight="bold">
-                {travel.date}
+                {formatDateTimeSimple(travel.date)}
               </Typography>
-              <Typography>Motorista: {travel.driverName}</Typography>
+              <Typography>Motorista: {travel.driver.name}</Typography>
               <Typography>Origem: {travel.origin}</Typography>
               <Typography>Destino: {travel.destination}</Typography>
               <Typography>Distância: {travel.distance}</Typography>
-              <Typography>Tempo: {travel.time}</Typography>
-              <Typography>Valor: R$ {travel.price.toFixed(2)}</Typography>
+              <Typography>Tempo: {travel.duration}</Typography>
+              <Typography>Valor: R$ {Number(travel.value).toFixed(2)}</Typography>
             </Paper>
           </Grid>
         ))}

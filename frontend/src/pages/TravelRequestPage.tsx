@@ -19,15 +19,14 @@ const TravelRequestPage: React.FC = () => {
       return;
     }
 
-
     RideEstimate()
   };
 
   function RideEstimate(){
     setError(null);
 
-    rideEstimate(userId, origin, destination).then((result)=>{
-      navigate('/options', { state: result });
+    rideEstimate(userId, origin, destination).then((rideEstimateResult)=>{
+      navigate('/options', { state: {rideEstimateResult, userId, origin, destination} });
     }).catch((error)=>{
       setError(error.response.data.error_description);
     })

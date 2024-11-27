@@ -12,19 +12,18 @@ export async function rideEstimate(customer_id: string, origin: string, destinat
 }
 
 export async function rideConfirm(ride: RideCreateType) {
-  try {
-    return (await api.patch('/ride/confirm', { ride })).data;
-  } catch (error) {
-    console.error('Error confirming ride:', error);
-    throw error;
-  }
+  const request = await api.patch('/ride/confirm', ride);
+
+  return request.data
 }
 
-export async function ridesGet(customer_id: string, driver_id: string) {
-  try {
-    return (await api.get(`/ride/?customer_id=${customer_id}&driver_id=${driver_id}`)).data;
-  } catch (error) {
-    console.error('Error fetching rides:', error);
-    throw error;
-  }
+export async function ridesGet(customer_id: string, driver_id?: string) {
+  const url = driver_id
+    ? `/ride/${customer_id}?driver_id=${driver_id}`
+    : `/ride/${customer_id}`;
+
+  const request = await api.get(url);
+
+  return request.data;
 }
+
