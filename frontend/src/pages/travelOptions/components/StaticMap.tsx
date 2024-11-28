@@ -3,7 +3,7 @@ import { decode, encode } from '@googlemaps/polyline-codec';
 import simplify from 'simplify-js';
 import { Typography, Paper } from '@mui/material';
 
-const GoogleMapsApiKey = '';
+const GoogleMapsApiKey = 'AIzaSyBfOgNq_dwFPeqeZpYuduMyOgQscxaaSNQ';
 
 interface MapProps {
   encodedPath: string;
@@ -29,7 +29,7 @@ const generateSimplifiedEncodedPath = (encodedPath: string): string => {
       coordinates.map(([lat, lng]) => ({ x: lat, y: lng })),
       tolerance
     ).map(({ x, y }) => [x, y]);
-    console.log(tolerance, "AQUI")
+
     simplifiedEncodedPath = encode(simplifiedCoordinates);
     url = `https://maps.googleapis.com/maps/api/staticmap?size=1000x400&path=enc:${simplifiedEncodedPath}&key=${GoogleMapsApiKey}`;
   }
