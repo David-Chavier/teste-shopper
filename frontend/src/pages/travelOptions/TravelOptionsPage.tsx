@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Box, Button, Card, CardContent, Typography, Grid } from '@mui/material';
+import { Box, Button, Card, CardContent, Typography, Grid, Alert } from '@mui/material';
 import StaticMap from './components/StaticMap';
 import { rideConfirm } from '../../services/rideService';
 import { RideCreateType } from '../../types/rideTypes';
@@ -29,7 +29,7 @@ const TravelOptionsPage: React.FC = () => {
     }
 
     rideConfirm(newRide).then((result)=>{
-      navigate('/history');
+      navigate('/history', { state: rideEstimateResult.options });
     }).catch((error)=>{
       setError(error.response.data.error_description);
     })
@@ -43,7 +43,6 @@ const TravelOptionsPage: React.FC = () => {
 
       <StaticMap encodedPath={rideEstimateResult.route.overview_polyline.points} />
 
-      {/* Lista de Motoristas */}
       <Grid container spacing={2}>
         {rideEstimateResult.options.map((driver: any) => (
           <Grid item xs={12} sm={6} md={4} key={driver.id}>
@@ -72,6 +71,12 @@ const TravelOptionsPage: React.FC = () => {
           </Grid>
         ))}
       </Grid>
+
+      {error && (
+        <Alert severity="error" onClose={() => setError(null)}>
+          {error}
+        </Alert>
+      )}
     </Box>
   );
 };

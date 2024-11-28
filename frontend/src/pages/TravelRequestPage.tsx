@@ -13,7 +13,6 @@ const TravelRequestPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validação de campos obrigatórios
     if (!userId || !origin || !destination) {
       setError('Todos os campos são obrigatórios.');
       return;

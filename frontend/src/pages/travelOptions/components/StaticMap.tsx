@@ -46,7 +46,7 @@ const StaticMap: React.FC<MapProps> = ({ encodedPath }) => {
   return (
     <Paper elevation={3} sx={{ padding: 2, textAlign: 'center' }}>
       <Typography variant="h6" gutterBottom>
-        Rota Estimada (Simplificada)
+        Rota Estimada
       </Typography>
       <img
         src={staticMapUrl}

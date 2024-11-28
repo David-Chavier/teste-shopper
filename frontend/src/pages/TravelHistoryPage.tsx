@@ -1,24 +1,25 @@
 import React, { useState } from 'react';
-import { Box, TextField, Select, MenuItem, Button, Typography, Grid, Paper } from '@mui/material';
+import { Box, TextField, Select, MenuItem, Button, Typography, Grid, Paper, Alert } from '@mui/material';
 import { ridesGet } from '../services/rideService';
+import { useLocation } from 'react-router-dom';
 
 const TravelHistoryPage: React.FC = () => {
+  const location = useLocation();
+  const drivers = location.state;
+
   const [userId, setUserId] = useState('');
-  const [selectedDriver, setSelectedDriver] = useState('all');
+  const [selectedDriver, setSelectedDriver] = useState<any | undefined>();
   const [travelHistory, setTravelHistory] = useState<any | undefined>();
   const [error, setError] = useState<string | null>(null);
 
   function handleFilter(){
     setError(null);
 
-    ridesGet(userId).then((rideEstimateResult)=>{
+    ridesGet(userId, selectedDriver.id).then((rideEstimateResult)=>{
       setTravelHistory(rideEstimateResult)
     }).catch((error)=>{
       setError(error.response.data.error_description);
     })
-  }
-  if(travelHistory?.ridesDTO){
-    console.log(travelHistory.ridesDTO)
   }
 
   function formatDateTimeSimple(isoString: string): string {
@@ -42,27 +43,30 @@ const TravelHistoryPage: React.FC = () => {
 
       {/* Filtros */}
       <Box display="flex" gap={2} alignItems="center" marginBottom={4}>
-        <TextField
-          label="ID do Usuário"
-          variant="outlined"
-          value={userId}
-          onChange={(e) => setUserId(e.target.value)}
-          fullWidth
-        />
-        <Select
-          value={selectedDriver}
-          onChange={(e) => setSelectedDriver(e.target.value)}
-          displayEmpty
-          fullWidth
-        >
-          <MenuItem value="all">Mostrar Todos</MenuItem>
-          <MenuItem value="João">João</MenuItem>
-          <MenuItem value="Maria">Maria</MenuItem>
-        </Select>
-        <Button variant="contained" color="primary" onClick={handleFilter}>
-          Aplicar Filtro
-        </Button>
-      </Box>
+      <TextField
+        label="ID do Usuário"
+        variant="outlined"
+        value={userId}
+        onChange={(e) => setUserId(e.target.value)}
+        fullWidth
+      />
+      <Select
+        value={selectedDriver}
+        onChange={(e) => setSelectedDriver(e.target.value)}
+        displayEmpty
+        fullWidth
+      >
+        <MenuItem value="all">Mostrar Todos</MenuItem>
+        {drivers.map((driver: any) => (
+          <MenuItem key={driver} value={driver}>
+            {driver.name}
+          </MenuItem>
+        ))}
+      </Select>
+      <Button variant="contained" color="primary" onClick={handleFilter}>
+        Aplicar Filtro
+      </Button>
+    </Box>
 
       <Grid container spacing={2}>
         {travelHistory?.ridesDTO.map((travel: any) => (
@@ -81,6 +85,12 @@ const TravelHistoryPage: React.FC = () => {
           </Grid>
         ))}
       </Grid>
+
+      {error && (
+        <Alert severity="error" onClose={() => setError(null)}>
+          {error}
+        </Alert>
+      )}
     </Box>
   );
 };
