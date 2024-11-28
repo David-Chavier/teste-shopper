@@ -2,20 +2,27 @@ import React, { useState } from 'react';
 import { Box, TextField, Select, MenuItem, Button, Typography, Grid, Paper, Alert } from '@mui/material';
 import { ridesGet } from '../services/rideService';
 import { useLocation } from 'react-router-dom';
+import { Driver } from '../types/rideTypes';
 
 const TravelHistoryPage: React.FC = () => {
   const location = useLocation();
-  const drivers = location.state;
+  const state = location.state as Driver[];
+
+  const drivers = state;
 
   const [userId, setUserId] = useState('');
-  const [selectedDriver, setSelectedDriver] = useState<any | undefined>();
+  const [selectedDriver, setSelectedDriver] = useState<string | undefined>();
   const [travelHistory, setTravelHistory] = useState<any | undefined>();
   const [error, setError] = useState<string | null>(null);
 
   function handleFilter(){
     setError(null);
 
-    ridesGet(userId, selectedDriver.id).then((rideEstimateResult)=>{
+    if(userId == ""){
+      return setError("ID do usuário é obrigatório");
+    }
+
+    ridesGet(userId, selectedDriver).then((rideEstimateResult)=>{
       setTravelHistory(rideEstimateResult)
     }).catch((error)=>{
       setError(error.response.data.error_description);
@@ -41,7 +48,6 @@ const TravelHistoryPage: React.FC = () => {
         Histórico de Viagens
       </Typography>
 
-      {/* Filtros */}
       <Box display="flex" gap={2} alignItems="center" marginBottom={4}>
       <TextField
         label="ID do Usuário"
@@ -56,9 +62,9 @@ const TravelHistoryPage: React.FC = () => {
         displayEmpty
         fullWidth
       >
-        <MenuItem value="all">Mostrar Todos</MenuItem>
-        {drivers.map((driver: any) => (
-          <MenuItem key={driver} value={driver}>
+        <MenuItem value="">Mostrar Todos</MenuItem>
+        {drivers.map((driver) => (
+          <MenuItem key={driver.id} value={driver.id}>
             {driver.name}
           </MenuItem>
         ))}
@@ -69,7 +75,7 @@ const TravelHistoryPage: React.FC = () => {
     </Box>
 
       <Grid container spacing={2}>
-        {travelHistory?.ridesDTO.map((travel: any) => (
+        {travelHistory?.rides.map((travel: any) => (
           <Grid item xs={12} key={travel.id}>
             <Paper elevation={3} sx={{ padding: 2 }}>
               <Typography variant="subtitle1" fontWeight="bold">
@@ -87,7 +93,16 @@ const TravelHistoryPage: React.FC = () => {
       </Grid>
 
       {error && (
-        <Alert severity="error" onClose={() => setError(null)}>
+        <Alert
+          severity="error"
+          onClose={() => setError(null)}
+          sx={{
+            position: "fixed",
+            bottom: 20,
+            zIndex: 10,
+            width: "300px",
+          }}
+        >
           {error}
         </Alert>
       )}

@@ -75,7 +75,16 @@ const TravelRequestPage: React.FC = () => {
         />
 
         {error && (
-          <Alert severity="error" onClose={() => setError(null)}>
+          <Alert
+            severity="error"
+            onClose={() => setError(null)}
+            sx={{
+              position: "fixed",
+              bottom: 20,
+              zIndex: 10,
+              minWidth: "300px",
+            }}
+          >
             {error}
           </Alert>
         )}

@@ -4,9 +4,9 @@ import { RideDTO } from "../../ride/dtos/ride.dto";
 
 export const getRidesByCustomerUsecase = async (customer_id: string, driver_id?: number) => {
   try {
-    const rides: RideModel[] = await RideRepository.findRidesByCustomer(customer_id, driver_id);
+    const ridesModel: RideModel[] = await RideRepository.findRidesByCustomer(customer_id, driver_id);
 
-    if (!rides.length) {
+    if (!ridesModel.length) {
       return {
         code: 404,
         data: {
@@ -16,7 +16,7 @@ export const getRidesByCustomerUsecase = async (customer_id: string, driver_id?:
       };
     }
 
-    const ridesDTO: RideDTO[] = rides.map((ride) => ({
+    const rides: RideDTO[] = ridesModel.map((ride) => ({
       id: ride.id,
       date: ride.date,
       destination: ride.destination,
@@ -34,7 +34,7 @@ export const getRidesByCustomerUsecase = async (customer_id: string, driver_id?:
       code: 200,
       data: {
         customer_id,
-        ridesDTO,
+        rides,
       },
     };
   } catch (error: any) {

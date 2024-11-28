@@ -1,12 +1,12 @@
 import axios from 'axios';
-import { RideCreateType } from '../types/rideTypes';
+import { RideCreateType, RideEstimateResult } from '../types/rideTypes';
 
 const api = axios.create({
   baseURL: 'http://localhost:8080',
 });
 
 export async function rideEstimate(customer_id: string, origin: string, destination: string) {
-  const request = await api.post('/ride/estimate', { customer_id, origin, destination });
+  const request = await api.post<RideEstimateResult>('/ride/estimate', { customer_id, origin, destination });
 
   return request.data
 }
@@ -24,6 +24,7 @@ export async function ridesGet(customer_id: string, driver_id?: string) {
 
   const request = await api.get(url);
 
+  console.log(request.data)
   return request.data;
 }
 

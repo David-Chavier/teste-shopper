@@ -3,13 +3,15 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Box, Button, Card, CardContent, Typography, Grid, Alert } from '@mui/material';
 import StaticMap from './components/StaticMap';
 import { rideConfirm } from '../../services/rideService';
-import { RideCreateType } from '../../types/rideTypes';
+import { LocationState, RideCreateType } from '../../types/rideTypes';
 
 const TravelOptionsPage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { rideEstimateResult, userId, origin, destination } = location.state;
+  const state = location.state as LocationState;
+
+  const { rideEstimateResult, userId, origin, destination } = state;
 
   const [error, setError] = useState<string | null>(null);
 
@@ -44,7 +46,7 @@ const TravelOptionsPage: React.FC = () => {
       <StaticMap encodedPath={rideEstimateResult.route.overview_polyline.points} />
 
       <Grid container spacing={2}>
-        {rideEstimateResult.options.map((driver: any) => (
+        {rideEstimateResult.options.map((driver) => (
           <Grid item xs={12} sm={6} md={4} key={driver.id}>
             <Card>
               <CardContent>
@@ -53,7 +55,7 @@ const TravelOptionsPage: React.FC = () => {
                   {driver.description}
                 </Typography>
                 <Typography variant="body2">Veículo: {driver.vehicle}</Typography>
-                <Typography variant="body2">Avaliação: {driver.review.rating}/5</Typography>
+                <Typography variant="body2">Avaliação: {driver.review?.rating}/5</Typography>
                 <Typography variant="body1" fontWeight="bold">
                   Valor: R$ {driver.value}
                 </Typography>
@@ -73,7 +75,16 @@ const TravelOptionsPage: React.FC = () => {
       </Grid>
 
       {error && (
-        <Alert severity="error" onClose={() => setError(null)}>
+        <Alert
+          severity="error"
+          onClose={() => setError(null)}
+          sx={{
+            position: "fixed",
+            bottom: 20,
+            zIndex: 10,
+            width: "300px",
+          }}
+        >
           {error}
         </Alert>
       )}
