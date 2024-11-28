@@ -24,7 +24,6 @@ export async function ridesGet(customer_id: string, driver_id?: string) {
 
   const request = await api.get(url);
 
-  console.log(request.data)
   return request.data;
 }
 
