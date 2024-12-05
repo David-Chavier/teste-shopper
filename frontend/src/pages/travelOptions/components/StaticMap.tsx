@@ -3,7 +3,7 @@ import { decode, encode } from '@googlemaps/polyline-codec';
 import simplify from 'simplify-js';
 import { Typography, Paper } from '@mui/material';
 
-const GoogleMapsApiKey = 'AIzaSyBfOgNq_dwFPeqeZpYuduMyOgQscxaaSNQ';
+const googleMapsApiKey = process.env.GOOGLE_API_KEY;
 
 interface MapProps {
   encodedPath: string;
@@ -21,7 +21,7 @@ const generateSimplifiedEncodedPath = (encodedPath: string): string => {
   ).map(({ x, y }) => [x, y]);
 
   let simplifiedEncodedPath = encode(simplifiedCoordinates);
-  let url = `https://maps.googleapis.com/maps/api/staticmap?size=1000x400&path=enc:${simplifiedEncodedPath}&key=${GoogleMapsApiKey}`;
+  let url = `https://maps.googleapis.com/maps/api/staticmap?size=1000x400&path=enc:${simplifiedEncodedPath}&key=${googleMapsApiKey}`;
 
   while (url.length > MAX_URL_LENGTH) {
     tolerance += 0.05;
@@ -31,7 +31,7 @@ const generateSimplifiedEncodedPath = (encodedPath: string): string => {
     ).map(({ x, y }) => [x, y]);
 
     simplifiedEncodedPath = encode(simplifiedCoordinates);
-    url = `https://maps.googleapis.com/maps/api/staticmap?size=1000x400&path=enc:${simplifiedEncodedPath}&key=${GoogleMapsApiKey}`;
+    url = `https://maps.googleapis.com/maps/api/staticmap?size=1000x400&path=enc:${simplifiedEncodedPath}&key=${googleMapsApiKey}`;
   }
 
   return simplifiedEncodedPath;
@@ -41,7 +41,7 @@ const StaticMap: React.FC<MapProps> = ({ encodedPath }) => {
 
   const simplifiedEncodedPath = generateSimplifiedEncodedPath(encodedPath);
 
-  const staticMapUrl = `https://maps.googleapis.com/maps/api/staticmap?size=1000x400&path=enc:${simplifiedEncodedPath}&key=${GoogleMapsApiKey}`;
+  const staticMapUrl = `https://maps.googleapis.com/maps/api/staticmap?size=1000x400&path=enc:${simplifiedEncodedPath}&key=${googleMapsApiKey}`;
 
   return (
     <Paper elevation={3} sx={{ padding: 2, textAlign: 'center' }}>
